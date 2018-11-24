@@ -183,13 +183,15 @@ const loserDivs = [].slice.call(document.getElementsByClassName('loser'));
 
 const onCompleted = (score, startedAt) => {
   const [winner, ...losers] = score;
+  const TPS = roundToTwo(winner.team_clicks / winner.users.length / (Math.floor(Date.now() / 1000) - startedAt));
   winnerDiv.getElementsByTagName('img')[0].src = `/img/${teamColors[winner.tid]}-win.png`;
-  winnerDiv.getElementsByTagName('p')[0].textContent = `${roundToTwo(winner.team_clicks / winner.users.length / (Math.floor(Date.now() / 1000) - startedAt))} TPS`;
+  winnerDiv.getElementsByTagName('p')[0].textContent = `${isNaN(TPS) ? 0 : TPS} TPS`;
 
   losers.forEach((loser, idx) => {
     const element = loserDivs[idx];
+    const TPS = roundToTwo(loser.team_clicks / loser.users.length / (Math.floor(Date.now() / 1000) - startedAt));
     element.getElementsByTagName('img')[0].src = `/img/${teamColors[loser.tid]}-lose.png`;
-    element.getElementsByTagName('p')[0].textContent = `${roundToTwo(loser.team_clicks / loser.users.length / (Math.floor(Date.now() / 1000) - startedAt))} TPS`;
+    element.getElementsByTagName('p')[0].textContent = `${isNaN(TPS) ? 0 : TPS} TPS`;
   });
 };
 

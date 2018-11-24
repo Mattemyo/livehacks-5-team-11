@@ -17,7 +17,7 @@
         color: white;
         font-family: Arial, Helvetica, sans-serif;
       }
-      img {
+      img:not(.resetButton) {
         width: 100px;
         height: 100px;
         animation: bounce 0.5s;
@@ -65,14 +65,16 @@
         align-items: center;
         font-size: 26px;
       }
-
+      .resetButton{
+        margin-left: 30%;
+        transform: translateY(-50px);
+      }
       @keyframes bounce {
         from { transform: translate3d(0,0,0);/* start */ }
         to   { transform: translate3d(0,11px,0);/* end   */ }
       }
     </style>
   </head>
-  <body>
   <canvas id="world"></canvas>
     <div class="wrapper">
       <div class="winner">
@@ -95,10 +97,10 @@
         </div>
       </div>
     </div>
-  </body>
+
+  <a href="pregame.html"><img src="img/resetButton.png" class="resetButton"></a>
   <script src="lib/main.js"></script>
   <script>
-
       (function() {
           if (localStorage.result) {
               console.log(localStorage.startedAt);
@@ -223,4 +225,5 @@
       //# sourceURL=coffeescript
 
   </script>
+  </body>
 </html>
