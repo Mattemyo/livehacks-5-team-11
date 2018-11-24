@@ -14,16 +14,45 @@
     background: white;
   }
   #left-button {
-    background: blue;
     color: white;
   }
 </style>
 
-<div class="wrapper"><button onclick="onLeftClick()" id="left-button">Left</button><button>Right</button></div>
+<div class="wrapper"><button onclick="toggleButtons()" id="left-button"></button><button disabled onclick="toggleButtons()" id="right-button"></button></div>
 
 <script>
-    const onLeftClick = () => {
-        socket.send({'team': '  '});
+    const AMOUNT_OF_TEAMS = 4;
+
+    const USER_ID   = (Date.now() + Math.random()).toString();
+    const TEAM      =  Math.floor(Math.random() * Math.floor(AMOUNT_OF_TEAMS));
+
+    const COLORS = ['#1bd9de', '#f4cc8a', '#14c926', '#dd122f'];
+    const ACTIVE_COLOR = COLORS[TEAM];
+
+    let isLeftActive = true;
+
+    const leftButton = document.getElementById('left-button');
+    const rightButton = document.getElementById('right-button');
+
+    leftButton.style.background = ACTIVE_COLOR;
+    rightButton.style.background = '#e0e0e0';
+
+    const toggleButtons = () => {
+        if(isLeftActive){
+            leftButton.style.background = '#e0e0e0';
+            leftButton.disabled = true;
+
+            rightButton.style.background = ACTIVE_COLOR;
+            rightButton.disabled = false;
+        }else{
+            leftButton.style.background = ACTIVE_COLOR;
+            leftButton.disabled = false;
+
+            rightButton.style.background = '#e0e0e0';
+            rightButton.disabled = true;
+        }
+        isLeftActive = !isLeftActive;
+        socket.send({'type': 'click'});
     };
 
   const createSocket = (url) => {
@@ -46,7 +75,7 @@
 
     const send = (payload) => {
         console.log(`Sending data: ${JSON.stringify(payload)}`);
-      connection.send(JSON.stringify(payload));
+        connection.send(JSON.stringify({...payload, team: TEAM, id: USER_ID}));
     };
 
     const ensureConnected = () => {
