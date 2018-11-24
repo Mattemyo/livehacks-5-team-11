@@ -13,12 +13,13 @@
         background: #353535;
         overflow: hidden;
       }
-      img {
+      img:not(img.title) {
         width: 60px;
         height: 60px;
       }
       .wrapper {
-        height: 100vh;
+        padding-top: 50px;
+        height: 80vh;
         width: 100vw;
         display: flex;
         flex-direction: column;
@@ -52,13 +53,19 @@
       #countdown-label {
         font-size: 20em;
         color: white;
+        transform: translateY(-60px);
+      }
+      #title {
+        width: 10vw;
+        margin-left: 45%;
       }
     </style>
   </head>
   <body>
-  <div style="width: 100vw; position:absolute; text-align: center">
-    <h1 id="countdown-label"></h1>
-  </div>
+    <img id="title" src="/img/title-group.png" />
+    <div style="width: 100vw; position:absolute; text-align: center">
+      <h1 id="countdown-label"></h1>
+    </div>
     <div class="wrapper">
       <div class="team-box">
         <img src="/img/red-dino.png" class="dino" id="0" />
