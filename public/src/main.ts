@@ -1,3 +1,11 @@
+const enum STATE {
+    PRE = 100,
+    RUNNING,
+    FINISHED
+}
+
+let gameState = STATE.PRE;
+
 const createSocket = (url) => {
   let connection = null;
   let connected = false;
@@ -65,6 +73,10 @@ const createSocket = (url) => {
   return { disconnect, setMessageHandler, getIsConnected };
 };
 
+const startGame = () => {
+
+};
+
 interface User {
   uid: string;
   team: number;
@@ -79,13 +91,25 @@ interface Team {
   team_clicks: number;
 }
 
-const maxProgress = 100;
-
 let users: User[] = [];
 let teams: Team[] = [];
 
+const registerUser = (message) => {
+    users.push({ uid: message.id, team: message.team, clicks: 0, isActive: true});
+
+    if (teams.filter((el) => el.tid === message.team).length === 0) {
+        teams.push({ tid: message.team, users: [], progress: 0.0, team_clicks: 0 });
+    }
+
+    let index = teams.indexOf(teams.filter((el) => el.tid === message.team)[0]);
+    teams[index].users.push({ uid: message.id, team: message.team, clicks: 0, isActive: true});
+};
+
 const createMessageHandler = () => {
   const removeInactiveUsers = () => {
+    if(gameState !== STATE.RUNNING){
+      return;
+    }
     console.log('removed inactive users');
     users = users.filter((user) => user.isActive);
     teams.forEach((team) =>{
@@ -98,39 +122,38 @@ const createMessageHandler = () => {
   setInterval(removeInactiveUsers, 5000);
 
   return (message) => {
+    if(gameState === STATE.PRE){
+        registerUser(message);
+        return;
+    }else if(gameState === STATE.RUNNING){
+
     let index;
     if (users.filter((user) => user.uid === message.id).length === 0) {
-      users.push({ uid: message.id, team: message.team, clicks: 0, isActive: true});
-
-      if (teams.filter((el) => el.tid === message.team).length === 0) {
-        teams.push({ tid: message.team, users: [], progress: 0.0, team_clicks: 0 });
-      }
-
-      index = teams.indexOf(teams.filter((el) => el.tid === message.team)[0]);
-      teams[index].users.push({ uid: message.id, team: message.team, clicks: 0, isActive: true});
+      registerUser(message);
     } else {
-      const user: User = users.filter((user) => user.uid === message.id)[0];
-      const team: Team = teams.filter((team) => team.tid === message.team)[0];
+        const user: User = users.filter((user) => user.uid === message.id)[0];
+        const team: Team = teams.filter((team) => team.tid === message.team)[0];
 
-      user.clicks++;
-      user.isActive = true;
-      index = teams.indexOf(teams.filter((el) => el.tid === message.team)[0]);
-      teams[index].users.filter((user) => user.uid === message.id)[0].isActive = true;
-      team.team_clicks++;
+        user.clicks++;
+        user.isActive = true;
+        index = teams.indexOf(teams.filter((el) => el.tid === message.team)[0]);
+        teams[index].users.filter((user) => user.uid === message.id)[0].isActive = true;
+        team.team_clicks++;
 
-      if(team.users.length !== 0){
-        team.progress = team.team_clicks / team.users.length / 2 / 100;
+        if (team.users.length !== 0) {
+            team.progress = team.team_clicks / team.users.length / 2 / 100;
+        }
+
+        if (team.progress >= 1) {
+            teams.sort((a, b) => {
+                return b.progress - a.progress;
+            });
+            console.log(teams);
+        }
+
+        console.log(team.progress);
+        updateTeamProgress(team.tid, team.progress);
       }
-
-      if(team.progress >= 1){
-        teams.sort((a, b) => {
-          return b.progress - a.progress;
-        });
-        console.log(teams);
-      }
-
-      console.log(team.progress);
-      updateTeamProgress(team.tid, team.progress);
     }
   };
 };
