@@ -1,10 +1,63 @@
-<body>
-  <script src="src/main.js"></script>
-  <style>
-    html,
-    body {
-      margin: 0;
-      padding: 0;
-    }
-  </style>
-</body>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Run!!!</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: black;
+        overflow: hidden;
+      }
+      img {
+        width: 60px;
+        height: 60px;
+      }
+      .wrapper {
+        height: 100vh;
+        width: 100vw;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      .team-box {
+        border-bottom: solid 2px red;
+        width: 80%;
+        margin: 30px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="team-box">
+        <img src="/img/volcano.png" />
+
+        <img src="/img/yellow-flag.png" />
+      </div>
+      <div class="team-box">
+        <img src="/img/volcano.png" />
+
+        <img src="/img/yellow-flag.png" />
+      </div>
+      <div class="team-box">
+        <img src="/img/volcano.png" />
+
+        <img src="/img/yellow-flag.png" />
+      </div>
+      <div class="team-box">
+        <img src="/img/volcano.png" />
+
+        <img src="/img/yellow-flag.png" />
+      </div>
+    </div>
+    <script src="src/main.js"></script>
+  </body>
+</html>
