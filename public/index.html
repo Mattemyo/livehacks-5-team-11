@@ -1,170 +1,175 @@
 <script src="https://cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
+/>
 <style>
-#avatar {
-  width: 300px;
-  height: 300px;
-  border-radius: 150px;
-  text-align: center;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  margin: -150px 0 0 -150px;
-  transition: 1s transform linear;
-  transform: scale(0);
-}
+  #avatar {
+    width: 300px;
+    height: 300px;
+    border-radius: 150px;
+    text-align: center;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin: -150px 0 0 -150px;
+    transition: 1s transform linear;
+    transform: scale(0);
+  }
 </style>
 
 <script>
-const createSocket = url => {
-  let connection = null
-  let connected = false
-  let connecting = false
-  let connectionChecker
+  const createSocket = (url) => {
+    let connection = null;
+    let connected = false;
+    let connecting = false;
+    let connectionChecker;
 
-  const connect = () => {
-    ensureConnected()
-    connectionChecker = setInterval(ensureConnected, 1000)
-  }
+    const connect = () => {
+      ensureConnected();
+      connectionChecker = setInterval(ensureConnected, 1000);
+    };
 
-  const disconnect = () => {
-    clearInterval(connectionChecker)
-    if (connection) {
-      connection.close()
-    }
-  }
-
-  const send = (payload) => {
-    connection.send(JSON.stringify(payload))
-  }
-
-  const ensureConnected = () => {
-    if (!connected && !connecting) {
-      console.log(`Attempting to connect to socket at ${url}`)
-      connecting = true
-      connection = new WebSocket(url)
-
-      connection.onopen = () => {
-        console.log('Connected to socket')
-        connecting = false
-        connected = true
+    const disconnect = () => {
+      clearInterval(connectionChecker);
+      if (connection) {
+        connection.close();
       }
+    };
 
-      connection.onclose = () => {
-        connection = null
-        if (connected) {
-          console.log('Lost connection to socket')
-          connected = false
+    const send = (payload) => {
+      connection.send(JSON.stringify(payload));
+    };
+
+    const ensureConnected = () => {
+      if (!connected && !connecting) {
+        console.log(`Attempting to connect to socket at ${url}`);
+        connecting = true;
+        connection = new WebSocket(url);
+
+        connection.onopen = () => {
+          console.log('Connected to socket');
+          connecting = false;
+          connected = true;
+        };
+
+        connection.onclose = () => {
+          connection = null;
+          if (connected) {
+            console.log('Lost connection to socket');
+            connected = false;
+          }
+          connecting = false;
+        };
+      }
+    };
+
+    const getIsConnected = () => connected;
+
+    connect();
+
+    return { disconnect, send, getIsConnected };
+  };
+
+  const STATE_ACTIVE = 'ACTIVE';
+  const STATE_INACTIVE = 'INACTIVE';
+
+  const createMotionActivityListener = (onChange, interval = 1000) => {
+    const threshold = 10;
+    let currentMax = 0;
+    let isActive = false;
+
+    const detectInactive = () => {
+      if (currentMax < threshold) {
+        isActive = false;
+        onChange(STATE_INACTIVE);
+      } else {
+        setTimeout(detectInactive, interval);
+      }
+      currentMax = 0;
+    };
+
+    window.addEventListener('devicemotion', (event) => {
+      currentMax = [event.acceleration.x, event.acceleration.y, event.acceleration.z]
+        .map(Math.abs)
+        .reduce((acc, value) => Math.max(acc, value), currentMax);
+      if (currentMax > threshold && !isActive) {
+        isActive = true;
+        onChange(STATE_ACTIVE);
+        setTimeout(detectInactive, interval);
+      }
+    });
+  };
+
+  const createMotionActivityHandler = (socket, element) => {
+    const maxProgress = 20;
+    let progress = 0;
+    const setProgress = (progress) => {
+      console.log(`Progress changed to ${progress}`);
+      element.style.transform = `scale(${progress ? (5 + progress) / (5 + maxProgress) : 0})`;
+    };
+
+    let timer;
+    const incrementProgress = () => {
+      progress++;
+      setProgress(progress);
+      if (progress < maxProgress) {
+        timer = setTimeout(incrementProgress, 1000);
+      }
+      if (socket.getIsConnected()) {
+        socket.send({ progress: progress / maxProgress });
+      }
+    };
+
+    return (state) => {
+      console.log(`Activity state changed to ${state}`);
+
+      switch (state) {
+        case STATE_ACTIVE: {
+          if (socket.getIsConnected()) {
+            socket.send({ state, avatar, color });
+          }
+          incrementProgress();
+          break;
         }
-        connecting = false
-      }
-    }
-  }
-
-  const getIsConnected = () => connected
-
-  connect()
-
-  return { disconnect, send, getIsConnected }
-}
-
-const STATE_ACTIVE = 'ACTIVE'
-const STATE_INACTIVE = 'INACTIVE'
-
-const createMotionActivityListener = (onChange, interval = 1000) => {
-  const threshold = 10;
-  let currentMax = 0;
-  let isActive = false
-
-  const detectInactive = () => {
-    if (currentMax < threshold) {
-      isActive = false
-      onChange(STATE_INACTIVE)
-    } else {
-      setTimeout(detectInactive, interval)
-    }
-    currentMax = 0
-  }
-
-  window.addEventListener('devicemotion', (event) => {
-    currentMax = [event.acceleration.x, event.acceleration.y, event.acceleration.z].map(Math.abs).reduce((acc, value) => Math.max(acc, value), currentMax)
-    if (currentMax > threshold && !isActive) {
-      isActive = true;
-      onChange(STATE_ACTIVE);
-      setTimeout(detectInactive, interval)
-    }
-  });
-}
-
-const createMotionActivityHandler = (socket, element) => {
-  const maxProgress = 20
-  let progress = 0;
-  const setProgress = progress => {
-    console.log(`Progress changed to ${progress}`)
-    element.style.transform = `scale(${progress ? (5 + progress) / (5 + maxProgress) : 0 })`
-  }
-
-  let timer
-  const incrementProgress = () => {
-    progress++
-    setProgress(progress)
-    if (progress < maxProgress) {
-      timer = setTimeout(incrementProgress, 1000)
-    }
-    if (socket.getIsConnected()) {
-      socket.send({ progress: progress / maxProgress });
-    }
-  }
-
-  return state => {
-    console.log(`Activity state changed to ${state}`)
-
-    switch (state) {
-      case STATE_ACTIVE: {
-        if (socket.getIsConnected()) {
-          socket.send({ state, avatar, color });
+        case STATE_INACTIVE: {
+          clearTimeout(timer);
+          progress = 0;
+          setProgress(0);
+          if (socket.getIsConnected()) {
+            socket.send({ state });
+          }
+          break;
         }
-        incrementProgress()
-        break;
       }
-      case STATE_INACTIVE: {
-        clearTimeout(timer)
-        progress = 0
-        setProgress(0)
-        if (socket.getIsConnected()) {
-          socket.send({ state });
-        }
-        break;
-      }
-    }
-  }
-}
+    };
+  };
 
-const WEBSOCKET_URL = 'ws://stagecast.se/api/events/livehacks_team11/ws';
-const AVATAR_ID = 'avatar';
+  const WEBSOCKET_URL = 'ws://stagecast.se/api/events/livehacks_team11/ws';
+  const AVATAR_ID = 'avatar';
 
-const avatars = [
-  'img/dinesh.png',
-  'img/erlich.png',
-  'img/gilfoyle.png',
-  'img/jared.png',
-  'img/richard.png',
-  'img/big-head.png',
-]
-const defaultAvatar = avatars[Math.floor(Math.random() * avatars.length)]
-const email = window.stagecast && stagecast.getUserId()
+  const avatars = [
+    'img/dinesh.png',
+    'img/erlich.png',
+    'img/gilfoyle.png',
+    'img/jared.png',
+    'img/richard.png',
+    'img/big-head.png',
+  ];
+  const defaultAvatar = avatars[Math.floor(Math.random() * avatars.length)];
+  const email = window.stagecast && stagecast.getUserId();
 
-const avatar = `https://s.gravatar.com/avatar/${md5(email)}?s=600&r=x&d=${window.location.origin}/${defaultAvatar}`
-const colors = ['DB5A08', 'FD9108', 'ECD34F', '57A46D', '35574C']
-const color = colors[Math.floor(Math.random() * colors.length)]
+  const avatar = `https://s.gravatar.com/avatar/${md5(email)}?s=600&r=x&d=${
+    window.location.origin
+  }/${defaultAvatar}`;
+  const colors = ['DB5A08', 'FD9108', 'ECD34F', '57A46D', '35574C'];
+  const color = colors[Math.floor(Math.random() * colors.length)];
 
-document.documentElement.style.backgroundColor = `#${color}`
-document.write(`<img id="avatar" src="${avatar}" />`)
+  document.documentElement.style.backgroundColor = `#${color}`;
+  document.write(`<img id="avatar" src="${avatar}" />`);
 
-const socket = createSocket(WEBSOCKET_URL)
-const avatarElement = document.getElementById(AVATAR_ID);
+  const socket = createSocket(WEBSOCKET_URL);
+  const avatarElement = document.getElementById(AVATAR_ID);
 
-createMotionActivityListener(
-  createMotionActivityHandler(socket, avatarElement)
-);
+  createMotionActivityListener(createMotionActivityHandler(socket, avatarElement));
 </script>
