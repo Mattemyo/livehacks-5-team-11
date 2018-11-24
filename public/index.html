@@ -4,13 +4,24 @@
   content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
 />
 <style>
+  body,
+  html {
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+  }
+  .initial-screen {
+    background: #353535;
+    position: absolute;
+  }
   .wrapper {
     width: 100%;
     height: 100%;
   }
   button {
-    width: 50%;
-    height: 100%;
+    display: block;
+    width: 100%;
+    height: 50%;
     background: white;
   }
   #left-button {
@@ -18,42 +29,46 @@
   }
 </style>
 
-<div class="wrapper"><button onclick="toggleButtons()" id="left-button"></button><button disabled onclick="toggleButtons()" id="right-button"></button></div>
+<div id="cover-screen" class="wrapper initial-screen"></div>
+<div class="wrapper">
+  <button onclick="toggleButtons()" id="left-button"></button
+  ><button disabled onclick="toggleButtons()" id="right-button"></button>
+</div>
 
 <script>
-    const AMOUNT_OF_TEAMS = 4;
+  const AMOUNT_OF_TEAMS = 4;
 
-    const USER_ID   = (Date.now() + Math.random()).toString();
-    const TEAM      =  Math.floor(Math.random() * Math.floor(AMOUNT_OF_TEAMS));
+  const USER_ID = (Date.now() + Math.random()).toString();
+  const TEAM = Math.floor(Math.random() * Math.floor(AMOUNT_OF_TEAMS));
 
-    const COLORS = ['#1bd9de', '#f4cc8a', '#14c926', '#dd122f'];
-    const ACTIVE_COLOR = COLORS[TEAM];
+  const COLORS = ['#dd122f', '#14c926', '#f4cc8a', '#1bd9de'];
+  const ACTIVE_COLOR = COLORS[TEAM];
 
-    let isLeftActive = true;
+  let isLeftActive = true;
 
-    const leftButton = document.getElementById('left-button');
-    const rightButton = document.getElementById('right-button');
+  const leftButton = document.getElementById('left-button');
+  const rightButton = document.getElementById('right-button');
 
-    leftButton.style.background = ACTIVE_COLOR;
-    rightButton.style.background = '#e0e0e0';
+  leftButton.style.background = ACTIVE_COLOR;
+  rightButton.style.background = '#e0e0e0';
 
-    const toggleButtons = () => {
-        if(isLeftActive){
-            leftButton.style.background = '#e0e0e0';
-            leftButton.disabled = true;
+  const toggleButtons = () => {
+    if (isLeftActive) {
+      leftButton.style.background = '#e0e0e0';
+      leftButton.disabled = true;
 
-            rightButton.style.background = ACTIVE_COLOR;
-            rightButton.disabled = false;
-        }else{
-            leftButton.style.background = ACTIVE_COLOR;
-            leftButton.disabled = false;
+      rightButton.style.background = ACTIVE_COLOR;
+      rightButton.disabled = false;
+    } else {
+      leftButton.style.background = ACTIVE_COLOR;
+      leftButton.disabled = false;
 
-            rightButton.style.background = '#e0e0e0';
-            rightButton.disabled = true;
-        }
-        isLeftActive = !isLeftActive;
-        socket.send({'type': 'click'});
-    };
+      rightButton.style.background = '#e0e0e0';
+      rightButton.disabled = true;
+    }
+    isLeftActive = !isLeftActive;
+    socket.send({ type: 'click' });
+  };
 
   const createSocket = (url) => {
     let connection = null;
@@ -74,8 +89,8 @@
     };
 
     const send = (payload) => {
-        console.log(`Sending data: ${JSON.stringify(payload)}`);
-        connection.send(JSON.stringify({...payload, team: TEAM, id: USER_ID}));
+      console.log(`Sending data: ${JSON.stringify(payload)}`);
+      connection.send(JSON.stringify({ ...payload, team: TEAM, id: USER_ID }));
     };
 
     const ensureConnected = () => {

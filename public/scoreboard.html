@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Score Board</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: #353535;
+        overflow: hidden;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+      img {
+        width: 100px;
+        height: 100px;
+      }
+      p {
+        font-size: 30px;
+      }
+      .wrapper {
+        width: 80%;
+        height: 80%;
+        margin: 200px auto;
+        justify-content: center;
+        align-items: center;
+      }
+      .winner {
+        display: flex;
+        justify-content: space-between;
+        padding: 0 250px;
+      }
+      .divider {
+        width: 80%;
+        margin: 10px auto;
+        border-bottom: 4px solid grey;
+      }
+      .losers {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .loser {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 0 20px;
+        justify-content: center;
+        align-items: center;
+        font-size: 26px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="winner">
+        <img src="/img/red-win.png" alt="winner" />
+        <p>50 TPS</p>
+      </div>
+      <div class="divider"></div>
+      <div class="losers">
+        <div class="loser"><img src="/img/green-lose.png" />50 TPS</div>
+        <div class="loser"><img src="/img/green-lose.png" />50 TPS</div>
+        <div class="loser"><img src="/img/green-lose.png" />50 TPS</div>
+      </div>
+    </div>
+  </body>
+  <script src="lib/main.js"></script>
+</html>
