@@ -142,6 +142,24 @@ const updateTeamProgress = (id, progress) => {
   element.style.transform = `translateX(calc(${progress} * 72vw + 5vw))`;
 };
 
+// ======== SCOREBOARD ======= //
+const teamColors = ['red', 'green', 'yellow', 'blue']; // each id corresponds to one color
+
+const winnerDiv = document.getElementsByClassName('winner')[0];
+const loserDivs = [].slice.call(document.getElementsByClassName('loser'));
+
+const onCompleted = (score) => {
+  const [winner, ...losers] = score;
+  winnerDiv.getElementsByTagName('img')[0].src = `/img/${teamColors[winner.tid]}-win.png`;
+  winnerDiv.getElementsByTagName('p')[0].textContent = `${winner.progress} TPS`;
+
+  losers.forEach((loser, idx) => {
+    const element = loserDivs[idx];
+    element.getElementsByTagName('img').src = `/img/${teamColors[loser.tid]}-lose.png`;
+    element.getElementsByTagName('p').textContent = `${loser.progress} PTS`;
+  });
+};
+
 // ======  WEBSOCKET ======= //
 const WEBSOCKET_URL = 'ws://stagecast.se/api/events/livehacks_team11/ws?x-user-listener=1';
 const socket = createSocket(WEBSOCKET_URL);
