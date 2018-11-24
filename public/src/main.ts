@@ -112,11 +112,11 @@ const createMessageHandler = () => {
     }
     console.log('removed inactive users');
     users = users.filter((user) => user.isActive);
-    teams.forEach((team) =>{
-       team.users = team.users.filter((user) => user.isActive);
-       team.users.forEach((user) => user.isActive = false);
+    teams.forEach((team) => {
+      team.users = team.users.filter((user) => user.isActive);
+      team.users.forEach((user) => (user.isActive = false));
     });
-    users.forEach((user) => user.isActive = false);
+    users.forEach((user) => (user.isActive = false));
   };
 
   setInterval(removeInactiveUsers, 5000);
@@ -140,16 +140,17 @@ const createMessageHandler = () => {
         teams[index].users.filter((user) => user.uid === message.id)[0].isActive = true;
         team.team_clicks++;
 
-        if (team.users.length !== 0) {
-            team.progress = team.team_clicks / team.users.length / 2 / 100;
-        }
+      if (team.users.length !== 0) {
+        team.progress = team.team_clicks / team.users.length / 2 / 100;
+      }
 
-        if (team.progress >= 1) {
-            teams.sort((a, b) => {
-                return b.progress - a.progress;
-            });
-            console.log(teams);
-        }
+      if (team.progress >= 0.3) {
+        teams.sort((a, b) => {
+          return b.progress - a.progress;
+        });
+        localStorage.result = JSON.stringify(teams);
+        window.location.href = '/scoreboard.html';
+      }
 
         console.log(team.progress);
         updateTeamProgress(team.tid, team.progress);
@@ -178,8 +179,8 @@ const onCompleted = (score) => {
 
   losers.forEach((loser, idx) => {
     const element = loserDivs[idx];
-    element.getElementsByTagName('img').src = `/img/${teamColors[loser.tid]}-lose.png`;
-    element.getElementsByTagName('p').textContent = `${loser.progress} PTS`;
+    element.getElementsByTagName('img')[0].src = `/img/${teamColors[loser.tid]}-lose.png`;
+    element.getElementsByTagName('p')[0].textContent = `${loser.progress} TPS`;
   });
 };
 
