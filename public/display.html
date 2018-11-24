@@ -10,7 +10,7 @@
       body {
         margin: 0;
         padding: 0;
-        background: black;
+        background: #353535;
         overflow: hidden;
       }
       img {
@@ -26,45 +26,57 @@
         align-items: center;
       }
       .team-box {
-        border-bottom: solid 2px red;
+        border-bottom: solid 7px red;
         width: 80%;
         margin: 30px 0;
         display: flex;
         justify-content: space-between;
-        align-items: center;
+        align-items: flex-end;
+      }
+      .team-box:nth-child(2) {
+        border-bottom-color: #61b872;
+      }
+      .team-box:nth-child(3) {
+        border-bottom-color: #f0c382;
+      }
+      .team-box:nth-child(4) {
+        border-bottom-color: #61c7de;
       }
       .dino {
         position: absolute;
         transform: translateX(calc(0 * 72vw + 5vw));
+      }
+      .flag {
+        transform: translateX(75%);
       }
     </style>
   </head>
   <body>
     <div class="wrapper">
       <div class="team-box">
-        <img src="/img/red-vic.png" class="dino" id="0" />
+        <img src="/img/red-dino.png" class="dino" id="0" />
 
-        <img src="/img/volcano.png" /> <img src="/img/yellow-flag.png" />
+        <img src="/img/volcano.png" /> <img class="flag" src="/img/red-flag.png" />
       </div>
 
       <div class="team-box">
-        <img src="/img/red-vic.png" class="dino" id="1" />
+        <img src="/img/green-dino.png" class="dino" id="1" />
 
-        <img src="/img/volcano.png" /> <img src="/img/yellow-flag.png" />
+        <img src="/img/forest.png" /> <img class="flag" src="/img/green-flag.png" />
       </div>
 
       <div class="team-box">
-        <img src="/img/red-vic.png" class="dino" id="2" />
+        <img src="/img/yellow-dino.png" class="dino" id="2" />
 
-        <img src="/img/volcano.png" /> <img src="/img/yellow-flag.png" />
+        <img src="/img/Sandstorm.png" /> <img class="flag" src="/img/yellow-flag.png" />
       </div>
 
       <div class="team-box">
-        <img src="/img/red-vic.png" class="dino" id="3" />
+        <img src="/img/blue-dino.png" class="dino" id="3" />
 
-        <img src="/img/volcano.png" /> <img src="/img/yellow-flag.png" />
+        <img src="/img/wave.png" /> <img class="flag" src="/img/blue-flag.png" />
       </div>
     </div>
-    <script src="src/main.js"></script>
+    <script src="lib/main.js"></script>
   </body>
 </html>
