@@ -109,7 +109,7 @@ const createMessageHandler = () => {
 };
 
 // ======= PROGRESS ANIMATION ======= //
-const elements = [0, 1, 2, 3].map((el) => <HTMLElement>document.querySelector(`#${el}`));
+const elements = ['0', '1', '2', '3'].map((el) => <HTMLElement>document.getElementById(el));
 const updateTeamProgress = (id, progress) => {
   const element = elements[id];
   element.style.transform = `translateX(calc(${progress} * 72vw + 5vw))`;
