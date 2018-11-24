@@ -74,7 +74,9 @@ const createSocket = (url) => {
 };
 
 const startGame = () => {
-
+  [0, 1, 2, 3].forEach((el) => teams.push({ tid: el, users: [], progress: 0.0, team_clicks: 0 }));
+  gameState = STATE.RUNNING;
+  users = [];
 };
 
 interface User {
@@ -123,7 +125,6 @@ const createMessageHandler = () => {
 
   return (message) => {
     if(gameState === STATE.PRE){
-        registerUser(message);
         return;
     }else if(gameState === STATE.RUNNING){
 
@@ -144,7 +145,7 @@ const createMessageHandler = () => {
         team.progress = team.team_clicks / team.users.length / 2 / 100;
       }
 
-      if (team.progress >= 0.3) {
+      if (team.progress >= 0.99) {
         teams.sort((a, b) => {
           return b.progress - a.progress;
         });
@@ -185,7 +186,20 @@ const onCompleted = (score) => {
   });
 };
 
+let timeUntilStart = 5;
+const countdown = () => {
+  if(timeUntilStart > 0){
+    document.getElementById('countdown-label').textContent = timeUntilStart.toString();
+    timeUntilStart -= 1;
+    setTimeout(this.countdown, 1000);
+  }else{
+      document.getElementById('countdown-label').textContent = '';
+    startGame();
+  }
+};
+
 // ======  WEBSOCKET ======= //
 const WEBSOCKET_URL = 'ws://stagecast.se/api/events/livehacks_team11/ws?x-user-listener=1';
 const socket = createSocket(WEBSOCKET_URL);
 socket.setMessageHandler(createMessageHandler());
+countdown();
