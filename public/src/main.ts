@@ -98,6 +98,7 @@ const createMessageHandler = () => {
   setInterval(removeInactiveUsers, 5000);
 
   return (message) => {
+    let index;
     if (users.filter((user) => user.uid === message.id).length === 0) {
       users.push({ uid: message.id, team: message.team, clicks: 0, isActive: true});
 
@@ -105,7 +106,7 @@ const createMessageHandler = () => {
         teams.push({ tid: message.team, users: [], progress: 0.0, team_clicks: 0 });
       }
 
-      let index = teams.indexOf(teams.filter((el) => el.tid === message.team)[0]);
+      index = teams.indexOf(teams.filter((el) => el.tid === message.team)[0]);
       teams[index].users.push({ uid: message.id, team: message.team, clicks: 0, isActive: true});
     } else {
       const user: User = users.filter((user) => user.uid === message.id)[0];
@@ -113,9 +114,22 @@ const createMessageHandler = () => {
 
       user.clicks++;
       user.isActive = true;
+      index = teams.indexOf(teams.filter((el) => el.tid === message.team)[0]);
+      teams[index].users.filter((user) => user.uid === message.id)[0].isActive = true;
       team.team_clicks++;
 
-      team.progress = team.team_clicks / team.users.length / 2 / 100;
+      if(team.users.length !== 0){
+        team.progress = team.team_clicks / team.users.length / 2 / 100;
+      }
+
+      if(team.progress >= 1){
+        teams.sort((a, b) => {
+          return b.progress - a.progress;
+        });
+        console.log(teams);
+      }
+
+      console.log(team.progress);
       updateTeamProgress(team.tid, team.progress);
     }
   };
