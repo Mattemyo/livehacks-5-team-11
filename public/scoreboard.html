@@ -65,11 +65,23 @@
       </div>
       <div class="divider"></div>
       <div class="losers">
-        <div class="loser"><img src="/img/green-lose.png" />50 TPS</div>
-        <div class="loser"><img src="/img/green-lose.png" />50 TPS</div>
-        <div class="loser"><img src="/img/green-lose.png" />50 TPS</div>
+        <div class="loser">
+          <img src="/img/green-lose.png" />
+          <p>50 TPS</p>
+        </div>
+        <div class="loser">
+          <img src="/img/green-lose.png" />
+          <p>50 TPS</p>
+        </div>
+        <div class="loser">
+          <img src="/img/green-lose.png" />
+          <p>50 TPS</p>
+        </div>
       </div>
     </div>
   </body>
   <script src="lib/main.js"></script>
+  <script>
+    onCompleted(JSON.parse(localStorage.result));
+  </script>
 </html>
