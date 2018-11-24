@@ -101,7 +101,7 @@ const createMessageHandler = () => {
             user.clicks++;
             team.team_clicks++;
 
-            team.progress = ((team.team_clicks / users.length) / 2) /  100;
+            team.progress = ((team.team_clicks / team.users.length) / 2) /  100;
             console.log(team.progress);
         }
     };
