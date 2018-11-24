@@ -19,12 +19,16 @@
   }
 </style>
 
-<div class="wrapper"><button onclick="onLeftClick()" id="left-button">Left</button><button>Right</button></div>
+<div class="wrapper"><button onclick="onLeftClick()" id="left-button">Left</button><button onclick="onRightClick()" id = "right-button">Right</button></div>
 
 <script>
     const onLeftClick = () => {
         socket.send({'team': '  '});
     };
+    const onRightClick = () => {
+        socket.send({'team': '  '});
+    };
+
 
   const createSocket = (url) => {
     let connection = null;
