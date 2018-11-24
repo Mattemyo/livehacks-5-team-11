@@ -1,0 +1,138 @@
+<script>
+const createSocket = url => {
+  let connection = null
+  let connected = false
+  let connecting = false
+  let connectionChecker
+  let messageHandler
+
+  const connect = () => {
+    ensureConnected()
+    connectionChecker = setInterval(ensureConnected, 1000)
+  }
+
+  const disconnect = () => {
+    clearInterval(connectionChecker)
+    if (connection) {
+      connection.close()
+    }
+  }
+
+  const handleMessage = message => {
+    if (message.data === 'END') {
+      disconnect()
+    } else {
+      let data
+      try {
+        data = JSON.parse(message.data)
+      } catch (err) {
+        return console.log('Got unparsable message', message.data)
+      }
+      if (messageHandler) {
+        messageHandler(data)
+      }
+    }
+  }
+
+  const ensureConnected = () => {
+    if (!connected && !connecting) {
+      console.log(`Attempting to connect to socket at ${url}`)
+      connecting = true
+      connection = new WebSocket(url)
+
+      connection.onmessage = handleMessage
+
+      connection.onopen = () => {
+        console.log('Connected to socket')
+        connecting = false
+        connected = true
+      }
+
+      connection.onclose = () => {
+        connection = null
+        if (connected) {
+          console.log('Lost connection to socket')
+          connected = false
+        }
+        connecting = false
+      }
+    }
+  }
+
+  const getIsConnected = () => connected
+
+  const setMessageHandler = handler => {
+    messageHandler = handler
+  }
+
+  connect()
+
+  return { disconnect, setMessageHandler, getIsConnected }
+}
+
+const STATE_ACTIVE = 'ACTIVE'
+const STATE_INACTIVE = 'INACTIVE'
+
+const createMotionActivityListener = (onChange, interval = 1000) => {
+  const threshold = 10;
+  let currentMax = 0;
+  let isActive = false
+
+  const detectInactive = () => {
+    if (currentMax < threshold) {
+      isActive = false
+      onChange(STATE_INACTIVE)
+    } else {
+      setTimeout(detectInactive, interval)
+    }
+    currentMax = 0
+  }
+
+  window.addEventListener('devicemotion', (event) => {
+    currentMax = [event.acceleration.x, event.acceleration.y, event.acceleration.z].map(Math.abs).reduce((acc, value) => Math.max(acc, value), currentMax)
+    if (currentMax > threshold && !isActive) {
+      isActive = true;
+      onChange(STATE_ACTIVE);
+      setTimeout(detectInactive, interval)
+    }
+  });
+}
+
+const createMessageHandler = onChange => {
+  let users = []
+
+  const findOrCreateUser = id => {
+    const existingUser = users.find(user => user.id === id)
+    if (existingUser) {
+      return existingUser;
+    }
+    const newUser = { id };
+    users.push(newUser);
+    return newUser;
+  }
+
+  const pruneInactiveUsers = () => {
+    users = users.filter(user => user.active)
+    users.forEach(user => {
+      user.active = false;
+    })
+    onChange(users)
+  }
+  setInterval(pruneInactiveUsers, 2000)
+
+  return message => {
+    const user = findOrCreateUser(message.from)
+    user.active = true
+    Object.assign(user, message.msg)
+    onChange(users)
+  }
+}
+
+const renderUsers = users => {
+  console.log('renderUsers', users)
+}
+
+const WEBSOCKET_URL = 'ws://stagecast.se/api/events/livehacks_team7/ws?x-user-listener=1';
+const socket = createSocket(WEBSOCKET_URL)
+socket.setMessageHandler(createMessageHandler(renderUsers))
+</script>
