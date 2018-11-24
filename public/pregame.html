@@ -1,11 +1,32 @@
 <!DOCTYPE html>
-<html lang="en" style="background: #353535">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Pre game</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            background: #303030;
+        }
+        .myButton {
+            width: 200px;
+            height: 60px;
+            margin-top: 30px;
+            background: green;
+            color: white;
+            border: none;
+            border-radius: 3px;
+        }
+        img {
+        }
+        </style>
 </head>
 <body>
-    <button onclick="AAAA()">START GAME</button>
+<img src="img/Phone-Screen-v2.png" />
+    <button class="myButton" onclick="AAAA()">START GAME</button>
     <script>
         const AAAA = () =>{
             window.location.href = ('display.html');
