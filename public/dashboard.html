@@ -132,7 +132,7 @@ const renderUsers = users => {
   console.log('renderUsers', users)
 }
 
-const WEBSOCKET_URL = 'ws://stagecast.se/api/events/livehacks_team7/ws?x-user-listener=1';
+const WEBSOCKET_URL = 'ws://stagecast.se/api/events/livehacks_team11/ws?x-user-listener=1';
 const socket = createSocket(WEBSOCKET_URL)
 socket.setMessageHandler(createMessageHandler(renderUsers))
 </script>
