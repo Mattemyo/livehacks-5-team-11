@@ -5,6 +5,7 @@ const enum STATE {
 }
 
 let gameState = STATE.PRE;
+let gameStartedAt;
 
 const createSocket = (url) => {
   let connection = null;
@@ -77,6 +78,7 @@ const startGame = () => {
   [0, 1, 2, 3].forEach((el) => teams.push({ tid: el, users: [], progress: 0.0, team_clicks: 0 }));
   gameState = STATE.RUNNING;
   users = [];
+  gameStartedAt = Math.floor(Date.now() / 1000);
 };
 
 interface User {
@@ -149,6 +151,7 @@ const createMessageHandler = () => {
         teams.sort((a, b) => {
           return b.progress - a.progress;
         });
+          localStorage.startedAt = gameStartedAt;
         localStorage.result = JSON.stringify(teams);
         gameState = STATE.FINISHED;
         window.location.href = '/scoreboard.html';
@@ -168,27 +171,32 @@ const updateTeamProgress = (id, progress) => {
   element.style.transform = `translateX(calc(${progress} * 72vw + 5vw))`;
 };
 
+const roundToTwo = (val) => {
+    return Math.round(val * 100) / 100;
+};
+
 // ======== SCOREBOARD ======= //
 const teamColors = ['red', 'green', 'yellow', 'blue']; // each id corresponds to one color
 
 const winnerDiv = document.getElementsByClassName('winner')[0];
 const loserDivs = [].slice.call(document.getElementsByClassName('loser'));
 
-const onCompleted = (score) => {
+const onCompleted = (score, startedAt) => {
   const [winner, ...losers] = score;
   winnerDiv.getElementsByTagName('img')[0].src = `/img/${teamColors[winner.tid]}-win.png`;
-  winnerDiv.getElementsByTagName('p')[0].textContent = `${winner.progress} TPS`;
+  winnerDiv.getElementsByTagName('p')[0].textContent = `${roundToTwo(winner.team_clicks / winner.users.length / (Math.floor(Date.now() / 1000) - startedAt))} TPS`;
 
   losers.forEach((loser, idx) => {
     const element = loserDivs[idx];
     element.getElementsByTagName('img')[0].src = `/img/${teamColors[loser.tid]}-lose.png`;
-    element.getElementsByTagName('p')[0].textContent = `${loser.progress} TPS`;
+    element.getElementsByTagName('p')[0].textContent = `${roundToTwo(loser.team_clicks / loser.users.length / (Math.floor(Date.now() / 1000) - startedAt))} TPS`;
   });
 };
 
 let timeUntilStart = 5;
 const countdown = () => {
   if(timeUntilStart > 0){
+    if(document.getElementById('countdown-label') === null){ return; }
     document.getElementById('countdown-label').textContent = timeUntilStart.toString();
     timeUntilStart -= 1;
     setTimeout(this.countdown, 1000);
