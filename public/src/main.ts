@@ -69,6 +69,7 @@ interface User {
   uid: string;
   team: number;
   clicks: number;
+  isActive: boolean;
 }
 
 interface Team {
@@ -84,25 +85,37 @@ let users: User[] = [];
 let teams: Team[] = [];
 
 const createMessageHandler = () => {
+  const removeInactiveUsers = () => {
+    console.log('removed inactive users');
+    users = users.filter((user) => user.isActive);
+    teams.forEach((team) =>{
+       team.users = team.users.filter((user) => user.isActive);
+       team.users.forEach((user) => user.isActive = false);
+    });
+    users.forEach((user) => user.isActive = false);
+  };
+
+  setInterval(removeInactiveUsers, 5000);
+
   return (message) => {
     if (users.filter((user) => user.uid === message.id).length === 0) {
-      users.push({ uid: message.id, team: message.team, clicks: 0 });
+      users.push({ uid: message.id, team: message.team, clicks: 0, isActive: true});
 
       if (teams.filter((el) => el.tid === message.team).length === 0) {
         teams.push({ tid: message.team, users: [], progress: 0.0, team_clicks: 0 });
       }
 
       let index = teams.indexOf(teams.filter((el) => el.tid === message.team)[0]);
-      teams[index].users.push({ uid: message.id, team: message.team, clicks: 0 });
+      teams[index].users.push({ uid: message.id, team: message.team, clicks: 0, isActive: true});
     } else {
       const user: User = users.filter((user) => user.uid === message.id)[0];
       const team: Team = teams.filter((team) => team.tid === message.team)[0];
 
       user.clicks++;
+      user.isActive = true;
       team.team_clicks++;
 
       team.progress = team.team_clicks / team.users.length / 2 / 100;
-      console.log(team.progress);
       updateTeamProgress(team.tid, team.progress);
     }
   };
