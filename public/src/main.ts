@@ -149,6 +149,7 @@ const createMessageHandler = () => {
           return b.progress - a.progress;
         });
         localStorage.result = JSON.stringify(teams);
+        gameState = STATE.FINISHED;
         window.location.href = '/scoreboard.html';
       }
 
