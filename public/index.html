@@ -29,7 +29,7 @@
   }
 </style>
 
-<div id="cover-screen" class="wrapper initial-screen"></div>
+<!-- <div id="cover-screen" class="wrapper initial-screen"></div> -->
 <div class="wrapper">
   <button onclick="toggleButtons()" id="left-button"></button
   ><button disabled onclick="toggleButtons()" id="right-button"></button>
@@ -123,7 +123,10 @@
     return { disconnect, send, getIsConnected };
   };
 
-  const WEBSOCKET_URL = 'ws://stagecast.se/api/events/livehacks_team11/ws';
+  const IP_ADDRESS = '192.168.22.1';
+  const PORT = 3000;
+  const GAME_ID = 0;
+  const WEBSOCKET_URL = `ws://${IP_ADDRESS}:${PORT}/${GAME_ID}/ws`;
 
   const socket = createSocket(WEBSOCKET_URL);
 </script>
