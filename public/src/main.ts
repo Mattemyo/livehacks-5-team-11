@@ -198,7 +198,7 @@ const onCompleted = (score, startedAt) => {
   });
 };
 
-let timeUntilStart = 5;
+let timeUntilStart = 10;
 const countdown = () => {
   if (timeUntilStart > 0) {
     if (document.getElementById('countdown-label') === null) {

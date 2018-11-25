@@ -62,6 +62,11 @@
     </style>
   </head>
   <body>
+    <audio
+      autoplay
+      preload="auto"
+      src="https://archive.org/download/SwedishHouseMafiaGreyhoundOriginalMix/Swedish%20House%20Mafia%20-%20Greyhound%20%28Original%20Mix%29.mp4"
+    ></audio>
     <img id="title" src="/img/title-group.png" />
     <div style="width: 100vw; position:absolute; text-align: center">
       <h1 id="countdown-label"></h1>
@@ -92,5 +97,8 @@
       </div>
     </div>
     <script src="lib/main.js"></script>
+    <script>
+      document.getElementsByTagName('audio')[0].currentTime = 53; // start when beat drops
+    </script>
   </body>
 </html>
